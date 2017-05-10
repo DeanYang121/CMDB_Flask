@@ -1,0 +1,16 @@
+dbutil：
+数据库类：
+    初始化的：__init___
+    私有的链接方法：__connect
+    执行sql语句方法：execute
+    获取所有的返回值：fetch
+    提交方法：commit
+    关闭链接：close
+    类方法执行sql语句：execute_sql
+模块方法：
+    execute_commit_sql()
+    execute_fetch_sql()
+    execute_sql()
+    bulker_commit_sql()
+
+==================================

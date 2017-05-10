@@ -1,0 +1,22 @@
+span {
+      background-color: red;
+      border: 5px solid blue;
+      border-radius: 5px;
+  }
+
+  div {
+    border: 5px solid red;
+  }
+
+  #myid {
+      position: absolute;
+      margin: 10px 20px 30px 40px;
+      padding: 20px;
+      width:500px;
+      top: 200px;
+      left: 200px;
+  }
+
+  .mydiv {
+      height: 200px;
+  }

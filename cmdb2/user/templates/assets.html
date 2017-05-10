@@ -1,0 +1,341 @@
+{% extends 'layout.html' %}
+{% block title %} 资产管理 {% endblock %}
+{% block link %}
+<link href="{{ url_for('static', filename='bootstrap-slider/css/bootstrap-slider.min.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='sweetalert-1.1.1/dist/sweetalert.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='DataTables-1.10.12/media/css/jquery.dataTables.min.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='bootstrapvalidator-0.4.5/dist/css/bootstrapValidator.min.css') }}" rel="stylesheet"/>
+{% endblock %}
+{% block nav_asset %} active {% endblock %}
+{% block main %}
+<button type="button" class="btn btn-default" data-toggle="modal" data-target="#dialog" data-title="添加资产" data-btn-txt="添加" data-url='/asset/create/'>添加资产</button>
+<br/><br/>
+<table class="table table-bordered table-striped table-hover">
+    <thead>
+        <tr>
+            <th>SN</th>
+            <th>IP(主机名)</th>
+            <th>操作系统</th>
+            <th>CPU/内存/硬盘</th>
+            <th>机房</th>
+            <th>使用者(业务)</th>
+            <th>采购时间(保修时长)</th>
+            <th>型号(供应商)</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for asset in assets %}
+        <tr>
+            <td>{{asset['sn']}}</td>
+            <td>{{asset['ip']}}({{asset['hostname']}})</td>
+            <td>{{asset['os']}}</td>
+            <td>{{asset['cpu']}}核/{{asset['ram']}}G/{{asset['disk']}}G</td>
+            <td>{{id_cs.get(asset['idc_id'])}}</td>
+            <td>{{asset['admin']}}({{asset['business']}})</td>
+            <td>{{asset['purchase_date']}}({{asset['warranty']}}年)</td>
+            <td>{{asset['model']}}({{asset['vendor']}})</td>
+            <td>
+                <button type="button" class="btn btn-xs btn-info" data-toggle="modal" data-target="#cmd-dialog" data-title="命令执行" data-btn-txt="执行" data-url="/asset/cmd/?id={{asset['id']}}">命令</button>
+                <button type="button" class="btn btn-xs btn-info" data-toggle="modal" data-target="#interval-dialog" data-title="查看监控" data-btn-txt="刷新" data-url="/asset/perform/?id={{asset['id']}}">监控</button>
+                <button type="button" class="btn btn-xs btn-primary" data-toggle="modal" data-target="#dialog" data-title="修改资产" data-btn-txt="修改" data-url="/asset/modify/?id={{asset['id']}}" data-sn="{{asset['sn']}}">修改</button>
+                <button type="button" class="btn btn-xs btn-danger btn-delete" data-url="/asset/delete/?id={{asset['id']}}" data-text="{{asset['hostname']}}">删除</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block dialog %}
+<div class="modal fade" id="dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">修改用户</h4>
+      </div>
+      <div class="modal-body">
+        新建资产
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary btn-form-submit">更新</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="interval-dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">修改用户</h4>
+      </div>
+      <div class="modal-body">
+        点击刷新，关闭请点停止
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default btn-interval-dialog-close">停止</button>
+          <button type="button" class="btn btn-primary btn-form-submit ">更新</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cmd-dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">修改用户</h4>
+      </div>
+      <div class="modal-body">
+        新建资产
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary btn-cmd-form-submit">更新</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+<script type="text/javascript"
+        src="{{ url_for('static', filename='bootstrap-slider/js/bootstrap-slider.min.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.min.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='bootstrap-datetimepicker-master/js/locales/bootstrap-datetimepicker.zh-CN.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='sweetalert-1.1.1/dist/sweetalert.min.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='DataTables-1.10.12/media/js/jquery.dataTables.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='DataTables-1.10.12/media/js/dataTables.bootstrap.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='bootstrapvalidator-0.4.5/dist/js/bootstrapValidator.min.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='Highcharts-4.2.5/js/highcharts.js') }}"></script>
+{% endblock %}
+{% block js %}
+    jQuery(document).ready(function() {
+        var timer_interval = null;
+        jQuery('#dialog').on('show.bs.modal',function(event){
+        if(!event.relatedTarget) {return;}
+        var button = jQuery(event.relatedTarget);
+      /*  console.log(button);
+        var sn = button.data('sn');
+        var ip = button.data('ip');
+        var hostname = button.data('hostname');
+        var os = button.data('os');
+        var cpu=button.data('cpu');
+        var ram = button.data('ram');
+        var disk = button.data('disk');
+        var id_cs = button.data('id_cs');
+        var admin = button.data('admin');
+        var business = button.data('business');
+        var purchase_date = button.data('purchase_date');
+        var model = button.data('model');
+        var warranty = button.data('warranty');
+        var vendor = button.data('vendor');
+        jQuery('#sn').val(sn)
+        jQuery('#ip').val(ip)
+        jQuery('#hostname').val(hostname)
+        jQuery('#os').val(os)
+        jQuery('#cpu').val(cpu)
+        jQuery('#ram').val(ram)
+        jQuery('#disk').val(disk)
+        jQuery('#id_cs').val(id_cs)
+        jQuery('#admin').val(admin)
+        jQuery('#business').val(business)
+        jQuery('#purchase_date').val(purchase_date)
+        jQuery('#model').val(model)
+        jQuery('#warranty').val(warranty)
+        jQuery('#vendor').val(vendor)
+        */
+        var title = button.data('title');
+        var btn_txt = button.data('btn-txt');
+        var url = button.data('url');
+        var that = this;
+        jQuery(that).find('.modal-title').text(title);
+        jQuery(that).find('.btn-form-submit').text(btn_txt)
+        /* jQuery(that).find('.modal-body').load(url);*/
+        jQuery.get(url, {}, function(result) {
+            jQuery(that).find('.modal-body').html(result);
+        });
+    });
+    jQuery('.btn-form-submit').on('click',function(){
+        var _form = jQuery('#dialog').find('form');
+        var bootstrapValidator = $(_form).data('');
+        if(bootstrapValidator) {
+            bootstrapValidator.validate();
+            if(!bootstrapValidator.isValid()) {return;}
+        }
+        jQuery.post(_form.attr('action'), _form.serializeArray(), function(result) {
+            if(result['is_ok']) {
+                if(result['success']) {
+                    //alert(result['success']);
+                    swal({
+                        title: result['success'],
+                        text: '',
+                        type: "success",
+                        showCancelButton: false,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        cancelButtonText: "关闭",
+                        closeOnConfirm: true,
+                        closeOnCancel: false
+                        },
+                        function(isConfirm){
+                            window.location.reload();
+                    });
+                }
+            } else {
+                var errors = [];
+                for(var key in result['errors']) {
+                    errors.push(result['errors'][key]);
+                }
+                //alert(errors.join('\n'));
+                swal({
+                        title: "错误信息",
+                        text: errors.join('\n'),
+                        type: "error",
+                        showCancelButton: false,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        cancelButtonText: "关闭",
+                        closeOnConfirm: true,
+                        closeOnCancel: false
+                    },
+                    function(isConfirm){
+                    }
+                );
+            }
+        }, 'json')
+    });
+
+    jQuery('.btn-delete').on('click', function() {
+        var that = this,
+            text = jQuery(that).data('text'),
+            url = jQuery(that).data('url');
+
+        swal({
+            title: "确定删除资产" + text,
+            text: '',
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "关闭",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+        function(isConfirm){
+            if(isConfirm) {
+                window.location.replace(url);
+            }
+        });
+    });
+
+    jQuery('#cmd-dialog').on('show.bs.modal',function(event){
+        if (!event.relatedTarget) {return;}
+        var button = jQuery(event.relatedTarget);
+        var title = button.data('title');
+        var btn_txt = button.data('btn-txt');
+        var url = button.data('url');
+        var that = this;
+       /* jQuery('.modal-title').val(title);*/
+        jQuery(that).find('.modal-title').text(title)
+        jQuery(that).find('.btn-cmd-form-submit').text(btn_txt)
+        jQuery(that).find('.modal-body').load(url)
+    });
+
+    jQuery('.btn-cmd-form-submit').on('click',function(){
+        var _form = jQuery('#cmd-dialog').find('form');
+        jQuery.post(_form.attr('action'), _form.serializeArray(), function(result) {
+            if(result['is_ok']) {
+                if(result['success']) {
+                  _form.find('#cmds-output').val(result['success']);
+                }
+            } else {
+                var errors = [];
+                for(var key in result['errors']) {
+                    errors.push(result['errors'][key]);
+                }
+                //alert(errors.join('\n'));
+                swal({
+                        title: "错误信息",
+                        text: errors.join('\n'),
+                        type: "error",
+                        showCancelButton: false,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        cancelButtonText: "关闭",
+                        closeOnConfirm: true,
+                        closeOnCancel: false
+                    },
+                    function(isConfirm){
+                    }
+                );
+            }
+        }, 'json')
+    });
+    jQuery('#interval-dialog').on('show.bs.modal',function(event){
+        if (!event.relatedTarget) {return;}
+        var button = jQuery(event.relatedTarget);
+        var title = button.data('title');
+        var btn_txt = button.data('btn-txt');
+        var url = button.data('url');
+        var that = this;
+        jQuery(that).find('.modal-title').text(title);
+        jQuery(that).find('.btn-form-submit').text(btn_txt);
+        timer_interval = setInterval(function() {
+            jQuery(that).find('.modal-body').load(url);
+        }, 10 * 1000)
+        console.log('open');
+        console.log(timer_interval);
+        /*
+        jQuery.get(url, {}, function(result) {
+            jQuery(that).find('.modal-body').html(result);
+        });
+        */
+    });
+    jQuery('.btn-interval-dialog-close').on('click',function(){
+        console.log('close');
+        console.log(timer_interval);
+        clearInterval(timer_interval);
+        jQuery('#interval-dailog').modal('hide');
+    });
+
+    jQuery('table').DataTable({
+        language: {
+            "sProcessing": "处理中...",
+            "sLengthMenu": "显示 _MENU_ 项结果",
+            "sZeroRecords": "没有匹配结果",
+            "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+            "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+            "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+            "sInfoPostFix": "",
+            "sSearch": "搜索:",
+            "sUrl": "",
+            "sEmptyTable": "表中数据为空",
+            "sLoadingRecords": "载入中...",
+            "sInfoThousands": ",",
+            "oPaginate": {
+                "sFirst": "首页",
+                "sPrevious": "上页",
+                "sNext": "下页",
+                "sLast": "末页"
+            },
+            "oAria": {
+                "sSortAscending": ": 以升序排列此列",
+                "sSortDescending": ": 以降序排列此列"
+            }
+        }
+    });
+
+});
+{% endblock %}

@@ -1,0 +1,230 @@
+{% extends "layout.html" %}
+{% block title %}图表{% endblock %}
+{% block nav_charts %}active{% endblock %}
+{% block main%}
+<div id="status_pie" style="height:400px"></div>
+<div id="time_status_stack" style="height:400px"></div>
+<div id="access_map" style="height:400px"></div>
+{% endblock %}
+{% block script %}
+<script type="text/javascript" src="{{url_for('static', filename='echarts-2.2.7/build/dist/echarts-all.js')}}"></script>
+{% endblock %}
+{% block js %}
+var status_pie = echarts.init(document.getElementById('status_pie'));
+var option = {
+    title : {
+        text: '访问日志状态码分布图',
+        subtext: '',
+        x:'center'
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: "{a} <br/>{b} : {c} ({d}%)"
+    },
+    legend: {
+        orient : 'vertical',
+        x : 'right',
+        data:{{status_legend|safe}}
+    },
+    toolbox: {
+        show : true,
+        orient: 'vertical',
+        x: 'left',
+        y: 'center',
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {
+                show: true,
+                type: ['pie', 'funnel'],
+                option: {
+                    funnel: {
+                        x: '25%',
+                        width: '50%',
+                        funnelAlign: 'left',
+                        max: 1548
+                    }
+                }
+            },
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    series : [
+        {
+            name:'状态码访问次数',
+            type:'pie',
+            radius : '55%',
+            center: ['50%', '60%'],
+            data: {{status_data|safe}}
+        }
+    ]
+};
+
+status_pie.setOption(option);
+
+var time_status_stack = echarts.init(document.getElementById('time_status_stack'));
+var time_status_stack_option = {
+    title : {
+        text: '访问日志时间状态码趋势图',
+        subtext: '',
+        x:'center'
+    },
+    tooltip : {
+        trigger: 'axis',
+        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },
+    legend: {
+        orient : 'vertical',
+        x : 'right',
+        data: {{time_status_legend|safe}}
+    },
+    toolbox: {
+        show : true,
+        orient: 'vertical',
+        x: 'left',
+        y: 'center',
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            data : {{time_status_xaxis|safe}}
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : {{time_status_data|safe}}
+};
+time_status_stack.setOption(time_status_stack_option);
+
+var access_map = echarts.init(document.getElementById('access_map'));
+var access_map_option = option = {
+    backgroundColor: '#1b1b1b',
+    color: ['gold','aqua','lime'],
+    title : {
+        text: '用户访问分布图',
+        subtext:'',
+        x:'center',
+        textStyle : {
+            color: '#fff'
+        }
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: '{b}'
+    },
+    legend: {
+        orient: 'vertical',
+        x:'left',
+        data:['北京'],
+        selectedMode: 'single',
+        selected:{
+        },
+        textStyle : {
+            color: '#fff'
+        }
+    },
+    toolbox: {
+        show : true,
+        orient : 'vertical',
+        x: 'right',
+        y: 'center',
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    dataRange: {
+        min : 0,
+        max : 100,
+        calculable : true,
+        color: ['#ff3333', 'orange', 'yellow','lime','aqua'],
+        textStyle:{
+            color:'#fff'
+        }
+    },
+    series : [
+        {
+            name: '全国',
+            type: 'map',
+            roam: true,
+            hoverable: false,
+            mapType: 'china',
+            itemStyle:{
+                normal:{
+                    borderColor:'rgba(100,149,237,1)',
+                    borderWidth:0.5,
+                    areaStyle:{
+                        color: '#1b1b1b'
+                    }
+                }
+            },
+            data:[],
+            geoCoord: {{geoCoord|safe}}
+        },
+        {
+            name: '北京',
+            type: 'map',
+            mapType: 'china',
+            data:[],
+            markLine : {
+                smooth:true,
+                effect : {
+                    show: true,
+                    scaleSize: 1,
+                    period: 30,
+                    color: '#fff',
+                    shadowBlur: 10
+                },
+                itemStyle : {
+                    normal: {
+                        borderWidth:1,
+                        lineStyle: {
+                            type: 'solid',
+                            shadowBlur: 10
+                        }
+                    }
+                },
+                data : {{markLine|safe}}
+            },
+            markPoint : {
+                symbol:'emptyCircle',
+                symbolSize : function (v){
+                    return 10 + v/10
+                },
+                effect : {
+                    show: true,
+                    shadowBlur : 0
+                },
+                itemStyle:{
+                    normal:{
+                        label:{show:false}
+                    },
+                    emphasis: {
+                        label:{position:'top'}
+                    }
+                },
+                data : {{markPoint|safe}}
+            }
+        }
+    ]
+};
+
+access_map.setOption(access_map_option);
+{% endblock %}

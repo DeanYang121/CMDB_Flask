@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link href="{{url_for('static',filename='bootstrap-3.3.5-dist/css/bootstrap.min.css')}}" rel="stylesheet" type="text/css">
+   <link href="{{url_for('static',filename='mian.css')}}" rel="stylesheet" type="text/css">
+    {% block link %}{% endblock %}
+    <style>
+        {% block style %}{% endblock %}
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">aicloud资产管理</a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a>欢迎{{ session.get('user','').get('username','') }}</a></li>
+                <li><a href="/logout/">退出登录</a>
+                </li>
+            </ul>
+        </div>
+        </nav>
+</div>
+        <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li class="list-group-item {% block nav_user %}{% endblock %}">
+                    <a href="/users/">用户管理</a>
+                </li>
+                <li class="list-group-item {% block nav_asset %}{% endblock %}">
+                    <a href="/assets/">资产管理</a>
+                </li>
+                <li class="list-group-item {% block nav_log %}{% endblock %}">
+                    <a href="/logs/">日志分析</a>
+                </li>
+                <li class="list-group-item {% block nav_charts %}{% endblock %}">
+                    <a href="/charts/">图表监控</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            {% block main %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% block dialog %}{% endblock %}
+<script type="text/javascript" src="{{ url_for('static', filename='jquery-1.12.4.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='bootstrap-3.3.5-dist/js/bootstrap.min.js') }}"></script>
+{% block script %}{% endblock %}
+<script type="text/javascript">{% block js %}{% endblock %}</script>
+</body>
+</html>
