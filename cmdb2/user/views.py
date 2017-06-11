@@ -14,6 +14,8 @@ from models import Asset
 from models import IDC,AccessLog,Accesslog2
 from models import Command,Performs
 import time
+from werkzeug import security
+import os
 
 def login_requried(func):
     @wraps(func)
@@ -174,10 +176,15 @@ def logs():
 @app.route('/uploadlogs/',methods=['POST'])
 @login_requried
 def update_log():
-    _file = request.form.get('logfile')
-    print('sssq2323232',_file)
+    # _file = request.form.get('logfile')
+    UPLOAD_FOLDER = '/home/work/web/app/cmdb2/user/uploads'
+    ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+    # _dirname = os.path.dirname(__file__)
+    _file = request.files.get('logfile')
+    print('sssq2323232',_file.filename)
     if _file:
-        _filepath = 'temp/%s'%time.strftime('%Y-%m-%d')
+        # _filepath = 'temp/%s'%time.strftime('%Y-%m-%d')
+        _filepath = '{dirname}/{_time}-{fname}'.format(dirname=UPLOAD_FOLDER,_time=time.strftime('%Y-%m-%d'),fname=_file.filename)
         print(_filepath)
         _file.save(_filepath)
     return redirect('/logs/')
